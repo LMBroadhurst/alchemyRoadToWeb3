@@ -1,0 +1,2 @@
+# Alchemy - Road to Web3
+This repo is a collection of my notes and work from the Alchemy Road to Web3 playlist found on YouTube. [https://www.youtube.com/watch?v=veBu03A6ptw&list=PLMj8NvODurfEYLsuiClgikZBGDfhwdcXF&ab_channel=Alchemy].
