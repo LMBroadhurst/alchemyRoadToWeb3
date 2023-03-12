@@ -3,6 +3,8 @@ pragma solidity ^0.8.9;
 
 import "../node_modules/hardhat/console.sol";
 
+// Deployed to Sepolia @ 0xc2F2630856e2C12418d263f8792F26e76205C4F0
+
 contract BuyMeACoffee {
 
     // Event to emit when a Memo is created

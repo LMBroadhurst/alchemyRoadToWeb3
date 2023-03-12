@@ -38,11 +38,9 @@ async function main() {
   // Get the example accounts we'll be working with.
   const [owner, tipper, tipper2, tipper3] = await hre.ethers.getSigners();
 
-  // We get the contract to deploy.
+  // Deploy the contract
   const BuyMeACoffee = await hre.ethers.getContractFactory("BuyMeACoffee");
   const buyMeACoffee = await BuyMeACoffee.deploy();
-
-  // Deploy the contract.
   await buyMeACoffee.deployed();
   console.log("BuyMeACoffee deployed to:", buyMeACoffee.address);
 
@@ -53,9 +51,9 @@ async function main() {
 
   // Buy the owner a few coffees.
   const tip = {value: hre.ethers.utils.parseEther("1")};
-  await buyMeACoffee.connect(tipper).buyCoffee("Carolina", "You're the best!", tip);
-  await buyMeACoffee.connect(tipper2).buyCoffee("Vitto", "Amazing teacher", tip);
-  await buyMeACoffee.connect(tipper3).buyCoffee("Kay", "I love my Proof of Knowledge", tip);
+  await buyMeACoffee.connect(tipper).buyCoffee("Lewis", "You're the best!", tip);
+  await buyMeACoffee.connect(tipper2).buyCoffee("Michael", "Amazing teacher", tip);
+  await buyMeACoffee.connect(tipper3).buyCoffee("Broadhurst", "I love my Proof of Knowledge", tip);
 
   // Check balances after the coffee purchase.
   console.log("== bought coffee ==");

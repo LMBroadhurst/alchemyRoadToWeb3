@@ -2,3 +2,4 @@
 *.pack
 *@*
 *node_modules
+.env
