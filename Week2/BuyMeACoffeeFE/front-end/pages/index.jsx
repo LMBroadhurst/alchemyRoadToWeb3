@@ -1,23 +1,26 @@
 import Head from 'next/head'
 import Footer from '../components/Footer'
-import abi from '../utils/BuyMeACoffee.json';
+import abi from '../utils/BuyMeACoffee.json'
 
 import { ethers } from 'ethers'
-import React, { useEffect, useState } from 'react'
-import BuyCoffeeForm from '../components/BuyCoffeeForm';
 
+import React, { useEffect, useState } from 'react'
+import BuyCoffeeForm from '../components/BuyCoffeeForm'
 
 export default function Home() {
 
   // Contract Address & ABI
-  const contractAddress = "0xc2F2630856e2C12418d263f8792F26e76205C4F0";
-  const contractABI = abi.abi;
+  const contractAddress = "0xc2F2630856e2C12418d263f8792F26e76205C4F0"
+  const contractABI = abi.abi
 
   // Component state
-  const [currentAccount, setCurrentAccount] = useState("");
-  const [name, setName] = useState("");
-  const [message, setMessage] = useState("");
-  const [memos, setMemos] = useState([]);
+  const [currentAccount, setCurrentAccount] = useState("")
+  const [name, setName] = useState("")
+  const [message, setMessage] = useState("")
+  const [memos, setMemos] = useState([])
+
+  // Values
+  let buyMeACoffee
 
   const onNameChange = (event) => {
     setName(event.target.value);
@@ -66,105 +69,106 @@ export default function Home() {
 
   const buyCoffee = async () => {
     try {
-      const {ethereum} = window;
+      const {ethereum} = window
 
       if (ethereum) {
-        const provider = new ethers.providers.Web3Provider(ethereum, "any");
-        const signer = provider.getSigner();
+        const provider = new ethers.providers.BrowserProvider(window.ethereum)
+        const signer = provider.getSigner()
         const buyMeACoffee = new ethers.Contract(
           contractAddress,
           contractABI,
           signer
-        );
+        )
 
         console.log("buying coffee..")
+
         const coffeeTxn = await buyMeACoffee.buyCoffee(
           name ? name : "anon",
           message ? message : "Enjoy your coffee!",
           {value: ethers.utils.parseEther("0.001")}
-        );
+        )
 
-        await coffeeTxn.wait();
+        await coffeeTxn.wait()
 
-        console.log("mined ", coffeeTxn.hash);
+        console.log("mined ", coffeeTxn.hash)
 
-        console.log("coffee purchased!");
+        console.log("coffee purchased!")
 
         // Clear the form fields.
-        setName("");
-        setMessage("");
+        setName("")
+        setMessage("")
       }
     } catch (error) {
-      console.log(error);
+      console.log(error)
     }
-  };
+  }
 
   // Function to fetch all memos stored on-chain.
   const getMemos = async () => {
     try {
-      const { ethereum } = window;
+      const { ethereum } = window
+
       if (ethereum) {
-        const provider = new ethers.providers.Web3Provider(ethereum);
-        const signer = provider.getSigner();
+        const provider = new ethers.providers.Web3Provider(ethereum)
+        const signer = provider.getSigner()
         const buyMeACoffee = new ethers.Contract(
           contractAddress,
           contractABI,
           signer
-        );
+        )
         
-        console.log("fetching memos from the blockchain..");
-        const memos = await buyMeACoffee.getMemos();
-        console.log("fetched!");
-        setMemos(memos);
+        console.log("fetching memos from the blockchain..")
+        const memos = await buyMeACoffee.getMemos()
+        console.log("fetched!")
+        setMemos(memos)
       } else {
-        console.log("Metamask is not connected");
+        console.log("Metamask is not connected")
       }
       
     } catch (error) {
-      console.log(error);
+      console.log(error)
     }
   };
 
-  useEffect(() => {
-    let buyMeACoffee;
-    isWalletConnected();
-    getMemos();
-
-    // Create an event handler function for when someone sends
-    // us a new memo.
-    const onNewMemo = (from, timestamp, name, message) => {
-      console.log("Memo received: ", from, timestamp, name, message);
-      setMemos((prevState) => [
-        ...prevState,
-        {
-          address: from,
-          timestamp: new Date(timestamp * 1000),
-          message,
-          name
-        }
-      ]);
-    };
-
-    const {ethereum} = window;
-
-    // // Listen for new memo events.
-    // if (ethereum) {
-    //   const provider = new ethers.providers.Web3Provider(ethereum, "any");
-    //   const signer = provider.getSigner();
-    //   buyMeACoffee = new ethers.Contract(
-    //     contractAddress,
-    //     contractABI,
-    //     signer
-    //   );
-
-    //   buyMeACoffee.on("NewMemo", onNewMemo);
-    // }
-
-    return () => {
-      if (buyMeACoffee) {
-        buyMeACoffee.off("NewMemo", onNewMemo);
+  // Create an event handler function for when someone sends us a new memo.
+  const onNewMemo = (from, timestamp, name, message) => {
+    console.log("Memo received: ", from, timestamp, name, message);
+    setMemos((prevState) => [
+      ...prevState,
+      {
+        address: from,
+        timestamp: new Date(timestamp * 1000),
+        message,
+        name
       }
+    ]);
+  };
+
+  useEffect(async () => {
+    isWalletConnected()
+    getMemos()
+
+    const { ethereum } = window
+
+    // Listen for new memo events.
+    if (window.ethereum) {
+      const provider = new ethers.BrowserProvider(ethereum, 'any')
+      const blockNumber = await provider.getBlockNumber()
+      const signer = provider.getSigner();
+      buyMeACoffee = new ethers.Contract(
+        contractAddress,
+        contractABI,
+        signer
+      );
+
+      buyMeACoffee.addListener("NewMemo", (signer, (await provider.getBlock(blockNumber)).timestamp, name, message));
     }
+
+    
+    if (buyMeACoffee) {
+      return buyMeACoffee.off("NewMemo", onNewMemo);
+    }
+    
   }, []);
 
 
