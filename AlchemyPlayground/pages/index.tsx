@@ -5,7 +5,8 @@ import ethLogo from '../assets/ETH-LOGO.png'
 import Image from 'next/image'
 
 import { Network, Alchemy } from "alchemy-sdk"
-import GetBlockByHash from '../components/GetBlockByHash'
+import GetBlockByNumber from '../components/GetBlockByNumber'
+import GetTransactionByHash from '../components/GetTransactionByHash'
 
 const settings = {
   apiKey: process.env.ALCHEMY_API_KEY,
@@ -45,7 +46,9 @@ export default function Home() {
           <Image src={ethLogo} alt={'ETH LOGO'} width={50} />
         </div>
 
-        <GetBlockByHash blockProperties={blockProperties} setBlockProperties={setBlockProperties} alchemy={alchemy} />
+        <GetBlockByNumber blockProperties={blockProperties} setBlockProperties={setBlockProperties} alchemy={alchemy} />
+
+        <GetTransactionByHash alchemy={alchemy} />
 
       </main>
     </div>
